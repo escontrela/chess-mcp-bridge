@@ -1,0 +1,32 @@
+package com.davidp.chessjourney.chess_mcp_bridge;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
+
+@RestController
+class ContextController {
+
+    private final RestClient http;
+    private final String activeUserPath;
+
+    ContextController(@Value("${chess.coreBaseUrl}") String baseUrl,
+                      @Value("${chess.activeUserPath}") String activeUserPath) {
+        this.http = RestClient.builder().baseUrl(baseUrl).build();
+        this.activeUserPath = activeUserPath;
+    }
+
+    @GetMapping("/context")
+    public Object context() {
+        try {
+            var user = http.get().uri(activeUserPath).retrieve()
+                    .body(ActiveUserTool.UserResponse.class);
+            return new ContextResponse("activeUser", user);
+        } catch (Exception e) {
+            return new ContextResponse("activeUser", new ActiveUserTool.ErrorResponse("No active user or error"));
+        }
+    }
+
+    record ContextResponse(String key, Object value) {}
+}
