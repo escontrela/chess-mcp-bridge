@@ -13,3 +13,4 @@ spring:
 chess:
   coreBaseUrl: http://localhost:8080
   activeUserPath: /chessjourney/activeUser
+  quotePath: /chessjourney/quote
